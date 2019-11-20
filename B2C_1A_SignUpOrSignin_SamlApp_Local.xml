@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TrustFrameworkPolicy
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+  PolicySchemaVersion="0.3.0.0"
+  TenantId="azureadb2ctests.onmicrosoft.com"
+  PolicyId="B2C_1A_SignUpOrSignin_SamlApp_Local"
+  PublicPolicyUri="http://azureadb2ctests.onmicrosoft.com/B2C_1A_SignUpOrSignin_SamlApp_Local">
+
+  <BasePolicy>
+    <TenantId>azureadb2ctests.onmicrosoft.com</TenantId>
+    <PolicyId>B2C_1A_TrustFrameworkExtensions_SamlApp_Local</PolicyId>
+  </BasePolicy>
+
+  <RelyingParty>
+    <DefaultUserJourney ReferenceId="SignUpOrSignIn" />
+    <TechnicalProfile Id="PolicyProfile">
+      <DisplayName>SAML RP</DisplayName>
+      <Protocol Name="SAML2" />
+        <Metadata>
+       <!-- https://login.microsoftonline.com/te/azureadb2ctests.onmicrosoft.com/B2C_1A_SignUpOrSignin_SamlApp_Local/samlp/metadata -->
+        <Item Key="IssuerUri">UsedAsEntityIdinMetadataPublishedbyB2c</Item>
+      </Metadata>
+      <OutputClaims>
+        <OutputClaim ClaimTypeReferenceId="displayName" />
+        <OutputClaim ClaimTypeReferenceId="givenName" />
+        <OutputClaim ClaimTypeReferenceId="surname" />
+        <OutputClaim ClaimTypeReferenceId="email" />
+        <OutputClaim ClaimTypeReferenceId="objectId"/>
+        <OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+
+      </OutputClaims>
+      <SubjectNamingInfo ClaimType="objectId"/> 
+    </TechnicalProfile>
+  </RelyingParty>
+</TrustFrameworkPolicy>
+
+
+

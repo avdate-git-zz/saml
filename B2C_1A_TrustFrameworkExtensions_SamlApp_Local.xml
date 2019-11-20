@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TrustFrameworkPolicy 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
+  PolicySchemaVersion="0.3.0.0" 
+  TenantId="azureadb2ctests.onmicrosoft.com" 
+  PolicyId="B2C_1A_TrustFrameworkExtensions_SamlApp_Local" 
+  PublicPolicyUri="http://azureadb2ctests.onmicrosoft.com/B2C_1A_TrustFrameworkExtensions_SamlApp_Local">
+  
+  <BasePolicy>
+    <TenantId>azureadb2ctests.onmicrosoft.com</TenantId>
+    <PolicyId>B2C_1A_TrustFrameworkBase_SamlApp_Local</PolicyId>
+  </BasePolicy>
+  <BuildingBlocks>
+
+  </BuildingBlocks>
+
+  <ClaimsProviders>
+    <ClaimsProvider>
+      <DisplayName>Token Issuer</DisplayName>
+      <TechnicalProfiles>
+        <!-- SAML Token Issuer technical profile -->
+        <TechnicalProfile Id="Saml2AssertionIssuer">
+          <DisplayName>Token Issuer</DisplayName>
+          <Protocol Name="None" />
+          <OutputTokenFormat>SAML2</OutputTokenFormat>
+          <Metadata>
+            <!-- The issuer contains the policy name, should the same one as configured in the relaying party application-->
+            <Item Key="IssuerUri">https://azureadb2ctests.b2clogin.com/azureadb2ctests.onmicrosoft.com/Signin</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="MetadataSigning" StorageReferenceId="B2C_1A_SamlCert" />
+            <Key Id="SamlAssertionSigning" StorageReferenceId="B2C_1A_SamlCert" />
+            <Key Id="SamlMessageSigning" StorageReferenceId="B2C_1A_SamlCert" />
+          </CryptographicKeys>
+          <InputClaims/>
+          <OutputClaims/>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Saml" />
+        </TechnicalProfile>
+
+        <!-- Session management technical profile for SAML based tokens -->
+        <TechnicalProfile Id="SM-Saml">
+          <DisplayName>Session Management Provider</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.SSO.SamlSSOSessionProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
+      <DisplayName>Local Account SignIn</DisplayName>
+      <TechnicalProfiles>
+         <TechnicalProfile Id="login-NonInteractive">
+          <Metadata>
+            <Item Key="client_id">1672154c-9816-4d71-9b1e-37af76420d01</Item>
+            <Item Key="IdTokenAudience">3710d26d-ce4f-4683-8fbb-2ffe67c8e174</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="1672154c-9816-4d71-9b1e-37af76420d01" />
+            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="3710d26d-ce4f-4683-8fbb-2ffe67c8e174" />
+          </InputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+  </ClaimsProviders>
+
+     <UserJourneys>
+
+      <UserJourney Id="SignUpOrSignIn">
+        <OrchestrationSteps>
+    
+          <OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+            <ClaimsProviderSelections>
+              <ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
+            </ClaimsProviderSelections>
+            <ClaimsExchanges>
+              <ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+            </ClaimsExchanges>
+          </OrchestrationStep>
+
+          <OrchestrationStep Order="2" Type="ClaimsExchange">
+            <Preconditions>
+              <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+                <Value>objectId</Value>
+                <Action>SkipThisOrchestrationStep</Action>
+              </Precondition>
+            </Preconditions>
+            <ClaimsExchanges>
+              <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
+            </ClaimsExchanges>
+          </OrchestrationStep>
+
+          <!-- This step reads any user attributes that we may not have received when in the token. -->
+          <OrchestrationStep Order="3" Type="ClaimsExchange">
+            <ClaimsExchanges>
+              <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+            </ClaimsExchanges>
+          </OrchestrationStep>
+  
+          <OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="Saml2AssertionIssuer" />
+      
+        </OrchestrationSteps>
+        <ClientDefinition ReferenceId="DefaultWeb" />
+      </UserJourney>
+	
+	  </UserJourneys>
+
+</TrustFrameworkPolicy>
